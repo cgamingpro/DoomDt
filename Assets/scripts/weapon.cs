@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.UIElements;
 
 public class weapon : MonoBehaviour
@@ -12,40 +13,46 @@ public class weapon : MonoBehaviour
     public float damage = 40;
 
     public float fireRate = 0.1f;
+    public Text ammoCountui;
     float fireTimer;
     public bool isReloading = false;
     public bool noAmmo = false;
     [SerializeField] Transform fpsCam;
     Animator animator;
-    //audio
+
+    [Header("audio shit")]
     AudioSource audioSource;
     [SerializeField] AudioClip shoot;
     [SerializeField] AudioClip reload;
 
-    //muzzleflash
+    [Header("muzzle flash and decal")]
     [SerializeField] ParticleSystem muzzleFlash;
     [SerializeField] ParticleSystem sparks;//thsi is jut placeholder will reaplce it with dynamic one's 
     [SerializeField] GameObject decal;
+    [SerializeField] GameObject bulletrail;
     
 
-    //type of fire 
+     
     public enum shootmode { auto,semi};
     public shootmode shootingMode;
     private bool Shootinput;
     public bool canSwitchMode;
 
-    //aimign down shit
+    [Header("aimign down shit")]
     private Vector3 originaPositon;
     public Vector3 aimdownPositon;
     public float adsSpeed;
     public bool isAds;
     private Vector3 targetPositon;
 
-    //weapon sway shit
+    [Header("weapon sway shit")]
     public float amount;
     public float clamp;
     public float smooth;
     private Vector3 swayoffset;
+    [SerializeField] private float WeaponSpread;
+    float spreadORGina;
+    [SerializeField] float weapnSpreadRunnin;
     
 
     // Start is called before the first frame update
@@ -55,8 +62,30 @@ public class weapon : MonoBehaviour
         animator = GetComponent<Animator>();
         audioSource = GetComponent<AudioSource>();
         originaPositon = transform.localPosition;
+        spreadORGina = WeaponSpread;
     }
 
+    private void OnEnable()
+    {
+        if(animator == null)
+        {
+            animator = GetComponent<Animator>();
+        }
+        animator.Rebind();
+        updateAmmo();
+
+    }
+    private void OnDisable()
+    {
+        cancelreload();
+    }
+    public void cancelreload()
+    {
+        StopAllCoroutines();
+        animator.Rebind();
+        isReloading = false;
+
+    }
     // Update is called once per frame
     void Update()
     {
@@ -147,7 +176,25 @@ public class weapon : MonoBehaviour
 
         RaycastHit hit;
 
-        if(Physics.Raycast(fpsCam.position,fpsCam.transform.forward,out hit,range))
+        Vector3 shootdir = fpsCam.transform.forward;
+
+        float moveErrorSpread = Input.GetAxisRaw("Horizontal") + Input.GetAxisRaw("Vertical");
+
+        if (moveErrorSpread > 0)
+        {
+            WeaponSpread = spreadORGina + weapnSpreadRunnin;
+        }
+        else
+        {
+            WeaponSpread = spreadORGina;
+        }
+
+        shootdir = shootdir + fpsCam.TransformDirection(new Vector3(Random.Range(-WeaponSpread, WeaponSpread), Random.Range(-WeaponSpread, WeaponSpread)));
+
+        //shootdir.x += Random.Range(-WeaponSpread , WeaponSpread );
+        //shootdir.y += Random.Range(-WeaponSpread , WeaponSpread );
+        
+        if(Physics.Raycast(fpsCam.position,shootdir,out hit,range))
         { 
             Instantiate(sparks, hit.point, Quaternion.LookRotation(hit.point.normalized));
             GameObject decl = Instantiate(decal, hit.point,Quaternion.FromToRotation(Vector3.forward,hit.normal));
@@ -160,6 +207,11 @@ public class weapon : MonoBehaviour
             }
 
         }
+        else
+        {
+            hit.point = fpsCam.position + shootdir * range;
+        }
+        
 
         animator.SetBool("fire", true);
         muzzleFlash.Play();
@@ -167,9 +219,20 @@ public class weapon : MonoBehaviour
         audioSource.clip = shoot;
         audioSource.Play();
 
-
+        BulletTrail(hit.point);
+        
         curretnAmmo--;
+        updateAmmo();
         fireTimer = 0;
+    }
+    private void BulletTrail(Vector3 hit)
+    {
+        GameObject btr = Instantiate(bulletrail, muzzleFlash.transform.position, Quaternion.identity);
+        
+        LineRenderer lr = btr.GetComponent<LineRenderer>();
+        lr.SetPosition(0,muzzleFlash.transform.position);
+        lr.SetPosition(1, hit);
+        Destroy(btr, 1f);
     }
 
     private IEnumerator Reload()
@@ -215,5 +278,10 @@ public class weapon : MonoBehaviour
 
 
 
+    }
+
+    public void updateAmmo()
+    {
+        ammoCountui.text = curretnAmmo + " / " + bulletsLeft;
     }
 }
