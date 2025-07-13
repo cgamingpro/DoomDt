@@ -13,11 +13,12 @@ public class weapon : MonoBehaviour
     public float damage = 40;
 
     public float fireRate = 0.1f;
-    public Text ammoCountui;
+
     float fireTimer;
     public bool isReloading = false;
     public bool noAmmo = false;
     [SerializeField] Transform fpsCam;
+
     Animator animator;
 
     [Header("audio shit")]
@@ -30,10 +31,10 @@ public class weapon : MonoBehaviour
     [SerializeField] ParticleSystem sparks;//thsi is jut placeholder will reaplce it with dynamic one's 
     [SerializeField] GameObject decal;
     [SerializeField] GameObject bulletrail;
-    
 
-     
-    public enum shootmode { auto,semi};
+
+
+    public enum shootmode { auto, semi };
     public shootmode shootingMode;
     private bool Shootinput;
     public bool canSwitchMode;
@@ -55,6 +56,37 @@ public class weapon : MonoBehaviour
     [SerializeField] float weapnSpreadRunnin;
     
 
+    [Header("UI")]
+    public Text ammoCountui;
+    public GameObject crossair;
+    public GameObject crossairHIT;
+    bool isCrossair = true;
+
+    [Header("recoiol camera + model")]
+    //hipfieresetting
+    [SerializeField] float recoilx;
+    [SerializeField] float recoily;
+    [SerializeField] float recoilz;
+
+
+    [SerializeField] RecoilGenrate recoilGenrate;
+    [SerializeField] float sannpiness;
+    [SerializeField] float returnSpeed;
+
+    //aimdown
+    [SerializeField] float aiMrecoilx;
+    [SerializeField] float aiMrecoily;
+    [SerializeField] float aiMrecoilz;
+
+    [Header("kickbak")]
+    [SerializeField] float kickbackStrength;
+    [SerializeField] float kickbackReturn;
+    Vector3 currentKickOffset;
+
+    
+
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -74,6 +106,19 @@ public class weapon : MonoBehaviour
         animator.Rebind();
         updateAmmo();
 
+         
+        recoilGenrate.recoilx = recoilx;
+        recoilGenrate.recoily = recoily;
+        recoilGenrate.recoilz = recoilz;
+
+        recoilGenrate.aiMrecoilz = aiMrecoilz;
+        recoilGenrate.aiMrecoily = aiMrecoily;
+        recoilGenrate.aiMrecoilx = aiMrecoilx;
+
+        recoilGenrate.snappines = sannpiness;
+        recoilGenrate.returnSpeed = returnSpeed; 
+        
+
     }
     private void OnDisable()
     {
@@ -89,7 +134,10 @@ public class weapon : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
 
+
+        ADS();
         if (isReloading) return;
 
 
@@ -127,14 +175,25 @@ public class weapon : MonoBehaviour
             
         }
 
-        ADS();
+        
+        if (isAds && isCrossair)
+        {
+            isCrossair = false;
+            crossair.SetActive(false);
+        }
+        else if(!isAds && !isCrossair )
+        {
+            isCrossair = true;
+            crossair.SetActive(true);
+        }
+
 
     }
    
 
     public void ADS()
     {
-
+        
         float Mousex = -Input.GetAxisRaw("Mouse X") * amount;
         float Mousey = -Input.GetAxisRaw("Mouse Y") * amount;
         Mousex = Mathf.Clamp(Mousex, -clamp, clamp);
@@ -148,10 +207,12 @@ public class weapon : MonoBehaviour
         isAds = Input.GetKey(KeyCode.Mouse1);
         Vector3 adsBase = isAds ? aimdownPositon : originaPositon;
 
-        targetPositon = adsBase + swayoffset;
+        currentKickOffset = Vector3.Lerp(currentKickOffset,Vector3.zero, Time.deltaTime * kickbackReturn);
+
+        targetPositon = adsBase + swayoffset + currentKickOffset;
 
         transform.localPosition = Vector3.Lerp(transform.localPosition, targetPositon, Time.deltaTime * adsSpeed);
-        fpsCam.GetComponent<Camera>().fieldOfView = isAds ? 40f : 60f;
+        fpsCam.GetComponent<Camera>().fieldOfView = isAds ? Mathf.Lerp(60,40,adsSpeed) : Mathf.Lerp(40,60,adsSpeed);
 
         /*
         if (Input.GetKey(KeyCode.Mouse1))
@@ -204,6 +265,7 @@ public class weapon : MonoBehaviour
             if(hit.transform.GetComponent<healthController>())
             {
                 hit.transform.GetComponent<healthController>().ApplyDamage(damage);
+                showHitCross();
             }
 
         }
@@ -219,11 +281,38 @@ public class weapon : MonoBehaviour
         audioSource.clip = shoot;
         audioSource.Play();
 
+        recoilGenrate.RecoilFIre(isAds);
+
         BulletTrail(hit.point);
+
+        kickBackOffsetApply();
         
         curretnAmmo--;
         updateAmmo();
         fireTimer = 0;
+    }
+
+    void kickBackOffsetApply()
+    {
+        if (isAds)
+        {
+            currentKickOffset.z -= kickbackStrength / 2;
+        }
+        else
+        {
+            currentKickOffset.z -= kickbackStrength;
+        }
+    }
+
+    void showHitCross()
+    {
+        crossairHIT.SetActive(true);
+        Invoke(nameof(hideHitCross), 0.1f);
+
+    }
+    void hideHitCross()
+    {
+        crossairHIT.SetActive(false);
     }
     private void BulletTrail(Vector3 hit)
     {
@@ -243,7 +332,7 @@ public class weapon : MonoBehaviour
         audioSource.clip = reload;
         audioSource.Play();
 
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(2);
 
         int ammoNeeded = bulletsPerMag - curretnAmmo;
         int toLOad = Mathf.Min(ammoNeeded,bulletsLeft);
