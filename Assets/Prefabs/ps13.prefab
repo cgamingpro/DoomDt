@@ -1617,7 +1617,7 @@ ParticleSystem:
     y:
       serializedVersion: 2
       minMaxState: 1
-      scalar: 1
+      scalar: 40
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -4066,7 +4066,7 @@ ParticleSystem:
     ratio: 1
     lifetime:
       serializedVersion: 2
-      minMaxState: 0
+      minMaxState: 1
       scalar: 0.9
       minScalar: 1
       maxCurve:
@@ -4074,7 +4074,7 @@ ParticleSystem:
         m_Curve:
         - serializedVersion: 3
           time: 0
-          value: 1
+          value: 0
           inSlope: 0
           outSlope: 0
           tangentMode: 0

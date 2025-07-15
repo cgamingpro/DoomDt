@@ -8,7 +8,7 @@ public class trailSpawner : MonoBehaviour
     public float delay;
     public Vector3 skycentre;
     public Vector3 spaawnlimit;
-
+    public Vector3 rotaion;
     public int maxTrail;
     private int currentTrial;
     // Start is called before the first frame update
@@ -24,7 +24,7 @@ public class trailSpawner : MonoBehaviour
         GameObject prefab = trailsOnj[Random.Range(0,trailsOnj.Length)];
 
         Vector3 randPos = skycentre + new Vector3((Random.Range(-spaawnlimit.x/2,spaawnlimit.x/2)), (Random.Range(-spaawnlimit.y / 2, spaawnlimit.y / 2)), (Random.Range(-spaawnlimit.z / 2, spaawnlimit.z / 2)));
-        GameObject trail = Instantiate(prefab, randPos, Quaternion.Euler(0, 0, 0f));
+        GameObject trail = Instantiate(prefab, randPos, Quaternion.Euler(rotaion.x, rotaion.y, rotaion.z));
         //Random.Range(45/4, (45+90)/4)
         currentTrial++;
 

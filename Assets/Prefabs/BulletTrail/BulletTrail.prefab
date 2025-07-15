@@ -50,7 +50,7 @@ LineRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 324a0767ee4cf8f448193840251d2de9, type: 2}
+  - {fileID: 2100000, guid: e3987a9b9bfc9454ab59f9f29ad7a6b0, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -76,36 +76,27 @@ LineRenderer:
   - {x: 0, y: 0, z: 1}
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 0.2
+    widthMultiplier: 0.03
     widthCurve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0
-        inSlope: Infinity
-        outSlope: Infinity
+        value: 1
+        inSlope: 0
+        outSlope: 0
         tangentMode: 0
         weightedMode: 0
         inWeight: 0.33333334
-        outWeight: 0
+        outWeight: 0.33333334
       - serializedVersion: 3
-        time: 0.10874301
-        value: 0.1
-        inSlope: 0.0639724
-        outSlope: 0.0639724
+        time: 0.51960784
+        value: 1.0271739
+        inSlope: 0
+        outSlope: 0
         tangentMode: 0
         weightedMode: 0
-        inWeight: 0.60767895
-        outWeight: 0.19366089
-      - serializedVersion: 3
-        time: 0.96429443
-        value: 0.1
-        inSlope: 0.05330647
-        outSlope: 0.05330647
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0.45549393
+        inWeight: 0
         outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
@@ -159,5 +150,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a813e3fcf24fb244b1a2648c2731b75, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  color: {r: 1, g: 0.79645944, b: 0.5330188, a: 1}
-  speed: 15
+  color: {r: 1, g: 1, b: 1, a: 1}
+  speed: 30
