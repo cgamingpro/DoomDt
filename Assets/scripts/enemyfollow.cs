@@ -45,14 +45,23 @@ public class enemyfollow : MonoBehaviour
     }
     void checkforPlayer()
     {
+        insight = false;
         directionTotarget = target.position - transform.position;
 
+        float coneAngle = Vector3.Angle(transform.forward, directionTotarget);
+
+
         RaycastHit hitinfo;
-        if (Physics.Raycast(transform.position, directionTotarget.normalized, out hitinfo,directionTotarget.magnitude))
+
+        if(coneAngle < 70)
         {
-            insight = hitinfo.transform.CompareTag("Player");
-            Debug.DrawRay(transform.position,directionTotarget,Color.red,999);
+            if (Physics.Raycast(transform.position, directionTotarget.normalized, out hitinfo, directionTotarget.magnitude))
+            {
+                insight = hitinfo.transform.CompareTag("Player");
+                //Debug.DrawRay(transform.position, directionTotarget, Color.red, 99);
+            }
         }
+       
     }
 
     void UpdateStates()
@@ -105,7 +114,7 @@ public class enemyfollow : MonoBehaviour
            
             currentState = States.follow;
         }
-        weapon.Fire();
+        weapon.Fire(transform);
         lookattarget();
     }
     void lookattarget()
@@ -163,8 +172,17 @@ public class enemyfollow : MonoBehaviour
         if (insight && directionTotarget.magnitude < maxFollowDistance)
         {
             AnimatorBool(false, true, false, false);
-        
-            currentState = States.follow;
+
+            if (directionTotarget.magnitude <= shootDistance)
+            {
+                AnimatorBool(false, false, false, true);
+                currentState = States.attack;
+            }
+            else if (directionTotarget.magnitude <= maxFollowDistance)
+            {
+                AnimatorBool(false, false, true, false); // run
+                currentState = States.follow;
+            }
         }
     }
 }

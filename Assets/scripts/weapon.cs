@@ -18,7 +18,8 @@ public class weapon : MonoBehaviour
     public bool isReloading = false;
     public bool noAmmo = false;
     public bool isSilenced = false;
-  
+    public string WeaponName;
+
     [SerializeField] Transform fpsCam;
     Animator animator;
 
@@ -127,11 +128,17 @@ public class weapon : MonoBehaviour
     private void OnDisable()
     {
         cancelreload();
+        
+        if (animator != null)
+        {
+            animator.ResetTrigger("reload");
+            animator.Rebind(); // Force reset
+            animator.Update(0f); // Ensure immediate rebind
+        }
     }
     public void cancelreload()
     {
         StopAllCoroutines();
-        animator.Rebind();
         isReloading = false;//samae tryig to fix the issue with stuck reload 
 
     }
@@ -365,7 +372,15 @@ public class weapon : MonoBehaviour
         audioSource.clip = reload;
         audioSource.Play();
 
-        yield return new WaitForSeconds(reloadTime);
+        //yield return new WaitForSeconds(reloadTime);
+
+        float timer = 0f;
+        while (timer < reloadTime)
+        {
+            if (!gameObject.activeInHierarchy) yield break; // weapon got switched
+            timer += Time.deltaTime;
+            yield return null;
+        }
 
         int ammoNeeded = bulletsPerMag - curretnAmmo;
         int toLOad = Mathf.Min(ammoNeeded,bulletsLeft);

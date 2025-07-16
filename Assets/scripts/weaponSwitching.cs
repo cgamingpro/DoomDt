@@ -28,6 +28,7 @@ public class weaponSwitching : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
         if(Input.GetAxis("Mouse ScrollWheel") > 0 && !isSwitching)
         {
             currentWeaponIndex++;
@@ -65,7 +66,8 @@ public class weaponSwitching : MonoBehaviour
         {
             if (weapons[i].GetComponent<weapon>().isReloading)
             {
-                weapons[i].GetComponent<weapon>().cancelreload();
+                //weapons[i].GetComponent<weapon>().cancelreload();
+                return;
             }
             weapons[i].SetActive(false);
         }

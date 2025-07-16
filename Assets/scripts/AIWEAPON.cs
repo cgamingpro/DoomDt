@@ -100,25 +100,7 @@ public class AIWEAPON : MonoBehaviour
         SilencerImp();//switch audio based on bool
 
        
-        if (isReloading) return;
-
-        if (Shootinput)
-        {
-            if (curretnAmmo >= 0)
-            {
-                Fire();
-
-            }
-            else
-            {
-                if (bulletsLeft > 0)
-                {
-                    StartCoroutine(Reload());//auto reloads and passed a bool
-                }
-                noAmmo = true;//can be passed into else to check if no ammo in stack
-            }
-        }
-      
+        if (isReloading) return;     
         
         //firerate ahndle 
         if (fireTimer < fireRate)
@@ -146,68 +128,85 @@ public class AIWEAPON : MonoBehaviour
     }
 
 
-    public void Fire()
+    public void Fire( Transform origion)
     {
         if (fireTimer < fireRate) return;
 
-        RaycastHit hit;
-
-        Vector3 shootdir = shootOrigion.transform.forward;
-
-        float moveErrorSpread = Input.GetAxisRaw("Horizontal") + Input.GetAxisRaw("Vertical");//chekcs if player is moving to add a extra bulllet spread
-
-        if (moveErrorSpread > 0)
+        if (curretnAmmo > 0)
         {
-            WeaponSpread = defaultBulletSpread + weapnSpreadRunnin;
-        }
-        else
-        {
-            WeaponSpread = defaultBulletSpread;
-        }
+            RaycastHit hit;
 
-        shootdir = shootdir + shootOrigion.TransformDirection(new Vector3(Random.Range(-WeaponSpread, WeaponSpread), Random.Range(-WeaponSpread, WeaponSpread)));//applys weapon spread
+            Vector3 shootdir = shootOrigion.transform.forward;
 
+            float moveErrorSpread = Input.GetAxisRaw("Horizontal") + Input.GetAxisRaw("Vertical");//chekcs if player is moving to add a extra bulllet spread
 
-        if (Physics.Raycast(shootOrigion.position, shootdir, out hit, range))
-        {
-            Instantiate(sparks, hit.point, Quaternion.LookRotation(hit.point.normalized));//spawn decal sparks
-
-
-            //spawn and destroy decals 
-            GameObject decl = Instantiate(decal, hit.point, Quaternion.FromToRotation(Vector3.forward, hit.normal));
-            decl.transform.SetParent(hit.transform);
-            Destroy(decl, 5f);
-
-            if (hit.transform.GetComponent<healthController>())
+            if (moveErrorSpread > 0)
             {
-                hit.transform.GetComponent<healthController>().ApplyDamage(damage);
-                
-
+                WeaponSpread = defaultBulletSpread + weapnSpreadRunnin;
+            }
+            else
+            {
+                WeaponSpread = defaultBulletSpread;
             }
 
+            shootdir = shootdir + shootOrigion.TransformDirection(new Vector3(Random.Range(-WeaponSpread, WeaponSpread), Random.Range(-WeaponSpread, WeaponSpread)));//applys weapon spread
+            
+
+            if (Physics.Raycast(origion.position + new Vector3(0,1f,0) , origion.forward, out hit, range))
+            {
+                Instantiate(sparks, hit.point, Quaternion.LookRotation(hit.point.normalized));//spawn decal sparks
+
+
+                //spawn and destroy decals 
+                GameObject decl = Instantiate(decal, hit.point, Quaternion.FromToRotation(Vector3.forward, hit.normal));
+                decl.transform.SetParent(hit.transform);
+                Destroy(decl, 5f);
+
+                if (hit.transform.GetComponent<PlayerHelapth>())
+                {
+                    int hitPorbab = Random.Range(0,5);
+
+                    if (hitPorbab == 2)
+                    {
+
+                        hit.transform.GetComponent<PlayerHelapth>().ApplyDamage(damage);
+                    }
+
+
+                }
+                Debug.DrawRay(origion.position + new Vector3(0, 1f, 0), origion.forward, Color.green, 999);
+
+            }
+            else
+            {
+                hit.point = shootOrigion.position + shootdir * range;//sets it for the bullettrail line render can use as the second point
+                
+            }
+
+            //stuff that ain't dependent on the hi 
+
+
+            animator.SetBool("fire", true);
+            muzzleFlash.Play();
+
+            audioSource.clip = shoot;
+            audioSource.Play();
+
+            BulletTrail(hit.point);
+
+
+
+            curretnAmmo--;
+
+            fireTimer = 0;
         }
         else
         {
-            hit.point = shootOrigion.position + shootdir * range;//sets it for the bullettrail line render can use as the second point
-            Debug.Log(hit.point + "yep hete sky");
+          
+     
+            StartCoroutine(Reload());//auto reloads and passed a bool
+          
         }
-
-        //stuff that ain't dependent on the hi 
-
-
-        animator.SetBool("fire", true);
-        muzzleFlash.Play();
-
-        audioSource.clip = shoot;
-        audioSource.Play();
-
-        BulletTrail(hit.point);
-
-
-
-        curretnAmmo--;
-       
-        fireTimer = 0;
     }
 
     
@@ -239,8 +238,7 @@ public class AIWEAPON : MonoBehaviour
         int ammoNeeded = bulletsPerMag - curretnAmmo;
         int toLOad = Mathf.Min(ammoNeeded, bulletsLeft);
 
-        curretnAmmo += toLOad;
-        bulletsLeft -= toLOad;
+        curretnAmmo = bulletsPerMag;
 
         isReloading = false;
     }
