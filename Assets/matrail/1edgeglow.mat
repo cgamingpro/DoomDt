@@ -10,7 +10,7 @@ Material:
   m_Name: 1edgeglow
   m_Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
   m_ShaderKeywords: _EMISSION
-  m_LightmapFlags: 2
+  m_LightmapFlags: 1
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
@@ -74,4 +74,4 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _EmissionColor: {r: 0.5163982, g: 0.66948164, b: 2.6701567, a: 1}
+    - _EmissionColor: {r: 7.1297374, g: 3.2617362, b: 1.9169576, a: 1}

@@ -18,6 +18,7 @@ public class enemyfollow : MonoBehaviour
     public AIWEAPON weapon;
     public Vector3 directionTotarget;
     public float maxFollowDistance;
+    public float maxVieAround = 70;
 
 
     
@@ -33,6 +34,11 @@ public class enemyfollow : MonoBehaviour
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
+        GameObject go = new GameObject("way1");
+        Transform initailwaypoint = Instantiate(go.transform,transform.position,quaternion.identity);
+        WayPoints[0] = initailwaypoint;
+        target = GameObject.Find("Player").transform;
+
     
     }
 
@@ -53,7 +59,7 @@ public class enemyfollow : MonoBehaviour
 
         RaycastHit hitinfo;
 
-        if(coneAngle < 70)
+        if(coneAngle < maxVieAround)
         {
             if (Physics.Raycast(transform.position, directionTotarget.normalized, out hitinfo, directionTotarget.magnitude))
             {

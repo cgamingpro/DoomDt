@@ -73,13 +73,12 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.postprocessing": {
-      "version": "3.0.3",
+      "version": "file:Unity-Post-Processing-Stack",
       "depth": 0,
-      "source": "registry",
+      "source": "embedded",
       "dependencies": {
         "com.unity.modules.physics": "1.0.0"
-      },
-      "url": "https://packages.unity.com"
+      }
     },
     "com.unity.probuilder": {
       "version": "4.4.0",

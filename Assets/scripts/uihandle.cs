@@ -7,10 +7,14 @@ using UnityEngine.UI;
 public class uihandle : MonoBehaviour
 {
     public playerMovment playerMovment;
-    public Slider slider;
+    public Slider SliderStamina;
     PostProcessVolume PostProcessVolume;
     public Transform postOBJ;
     Vignette dashmsk;
+    [SerializeField] PlayerHelapth playerHelapth;
+    [SerializeField] Slider SliderHealth;
+    [SerializeField] Text Text_medkitNumber;
+  
     
     private void Start()
     {
@@ -27,7 +31,11 @@ public class uihandle : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        slider.value = (playerMovment.currentStamina/playerMovment.maxstamina);
+        SliderStamina.value = (playerMovment.currentStamina/playerMovment.maxstamina);
+       
+        SliderHealth.value = (playerHelapth.currentHealth / playerHelapth.maxhealth);
+
+        Text_medkitNumber.text = playerHelapth.medPackNumber.ToString();
 
         if (playerMovment.isDashing)
         {

@@ -48,6 +48,8 @@ public class PlayerWeaponInventory : MonoBehaviour
                 AddWeapon(pickup);
                 Destroy(hit.transform.gameObject);
             }
+
+            else { Debug.Log("pickup is null "); }
         }
         Debug.DrawRay( fpscam.transform.position,  fpscam.transform.forward,Color.red,5);
     }

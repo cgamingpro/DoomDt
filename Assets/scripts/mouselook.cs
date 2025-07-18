@@ -18,10 +18,10 @@ public class mouselook : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.Locked;
     }
-    public void Update()
+    public void LateUpdate()
     {
-        float mouseX = Input.GetAxisRaw("Mouse X") * mouseSensX * Time.deltaTime;
-        float mouseY = Input.GetAxisRaw("Mouse Y")* mouseSensY * Time.deltaTime;
+        float mouseX = Input.GetAxis("Mouse X") * mouseSensX ;
+        float mouseY = Input.GetAxis("Mouse Y")* mouseSensY ;
         rotationx -= mouseY;
         rotationy += mouseX;
         rotationx = Mathf.Clamp(rotationx, -90, 90);

@@ -20,6 +20,7 @@ public class weapon : MonoBehaviour
     public bool isSilenced = false;
     public string WeaponName;
 
+
     [SerializeField] Transform fpsCam;
     Animator animator;
 
@@ -64,6 +65,9 @@ public class weapon : MonoBehaviour
     public Text ammoCountui;
     public GameObject crossair;
     public GameObject crossairHIT;
+    [SerializeField]GameObject weaponIcon;
+    [SerializeField] Sprite Weaponimage;
+
     bool isCrossair = true;
 
     [Header("recoiol camera + model")]
@@ -88,6 +92,9 @@ public class weapon : MonoBehaviour
     [SerializeField] float kickbackReturn;
     Vector3 currentKickOffset;
 
+    [SerializeField]
+    LayerMask _layer;
+
 
 
 
@@ -100,6 +107,7 @@ public class weapon : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
         originaPositon = transform.localPosition;//for aiming down
         defaultBulletSpread = WeaponSpread;//to switch 
+        
     }
 
     private void OnEnable()
@@ -122,6 +130,8 @@ public class weapon : MonoBehaviour
 
         recoilGenrate.snappines = sannpiness;
         recoilGenrate.returnSpeed = returnSpeed;
+
+        weaponIcon.GetComponent<UnityEngine.UI.Image>().sprite = Weaponimage;
 
 
     }
@@ -273,7 +283,7 @@ public class weapon : MonoBehaviour
         //shootdir.x += Random.Range(-WeaponSpread , WeaponSpread );
         //shootdir.y += Random.Range(-WeaponSpread , WeaponSpread );
         
-        if(Physics.Raycast(fpsCam.position,shootdir,out hit,range))
+        if(Physics.Raycast(fpsCam.position,shootdir,out hit,range,_layer ,QueryTriggerInteraction.Ignore))
         { 
             Instantiate(sparks, hit.point, Quaternion.LookRotation(hit.point.normalized));//spawn decal sparks
 
